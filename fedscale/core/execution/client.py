@@ -48,10 +48,10 @@ class Client(object):
         criterion = self.get_criterion(conf)
         error_type = None
 
-        # TODO: One may hope to run fixed number of epochs, instead of iterations
+        # NOTE: If one may hope to run fixed number of epochs, instead of iterations, use `while self.completed_steps < conf.local_steps * len(client_data)` instead
         # while self.completed_steps < conf.local_steps:
-        self.completed_epochs = 0
-        while self.completed_epochs < conf.local_epochs:
+        while self.completed_steps < conf.local_steps * len(client_data):
+
             try:
                 # self.train_step(client_data, conf, model, optimizer, criterion)
                 self.train_epoch(client_data, conf, model, optimizer, criterion)
