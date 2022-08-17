@@ -39,6 +39,8 @@ def process_cmd(yaml_file, local=False):
     worker_ips, total_gpus = [], []
     cmd_script_list = []
 
+    # python_path = yaml_conf['python_path']
+
     executor_configs = "=".join(yaml_conf['worker_ips'])
     for ip_gpu in yaml_conf['worker_ips']:
         ip, gpu_list = ip_gpu.strip().split(':')
@@ -80,10 +82,12 @@ def process_cmd(yaml_file, local=False):
     # =========== Submit job to parameter server ============
     running_vms.add(ps_ip)
     ps_cmd = f" python {yaml_conf['exp_path']}/{yaml_conf['aggregator_entry']} {conf_script} --this_rank=0 --num_executors={total_gpu_processes} --executor_configs={executor_configs} "
+    # ps_cmd = f" {python_path} {yaml_conf['exp_path']}/{yaml_conf['aggregator_entry']} {conf_script} --this_rank=0 --num_executors={total_gpu_processes} --executor_configs={executor_configs} "
 
     with open(f"{job_name}_logging", 'wb') as fout:
         pass
 
+    print(f"Starting aggregator on {ps_ip}...")
     print(f"Starting aggregator on {ps_ip}...")
     with open(f"{job_name}_logging", 'a') as fout:
         if local:
@@ -102,6 +106,7 @@ def process_cmd(yaml_file, local=False):
         for cuda_id in range(len(gpu)):
             for _ in range(gpu[cuda_id]):
                 worker_cmd = f" python {yaml_conf['exp_path']}/{yaml_conf['executor_entry']} {conf_script} --this_rank={rank_id} --num_executors={total_gpu_processes} --cuda_device=cuda:{cuda_id} "
+                # worker_cmd = f" {python_path} {yaml_conf['exp_path']}/{yaml_conf['executor_entry']} {conf_script} --this_rank={rank_id} --num_executors={total_gpu_processes} --cuda_device=cuda:{cuda_id} "
                 rank_id += 1
 
                 with open(f"{job_name}_logging", 'a') as fout:
@@ -139,6 +144,8 @@ def terminate(job_name):
         with open(f"{job_name}_logging", 'a') as fout:
             subprocess.Popen(f'ssh {job_meta["user"]}{vm_ip} "python {current_path}/shutdown.py {job_name}"',
                              shell=True, stdout=fout, stderr=fout)
+            # subprocess.Popen(f'ssh {job_meta["user"]}{vm_ip} "{python_path} {current_path}/shutdown.py {job_name}"',
+            #                  shell=True, stdout=fout, stderr=fout)
 
 print_help: bool = False
 if len(sys.argv) > 1:

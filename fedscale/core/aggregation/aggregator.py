@@ -14,6 +14,8 @@ from fedscale.core.channels import job_api_pb2
 from fedscale.core.logger.aggragation import *
 from fedscale.core.resource_manager import ResourceManager
 
+from fedscale.
+
 MAX_MESSAGE_LENGTH = 1*1024*1024*1024  # 1GB
 
 
@@ -516,6 +518,7 @@ class Aggregator(job_api_pb2_grpc.JobServiceServicer):
 
         avg_loss = sum(self.loss_accumulator) / \
             max(1, len(self.loss_accumulator))
+        logging.info(f"Test, local_epochs: {self.args.local_epochs}")
         logging.info(f"Wall clock: {round(self.global_virtual_clock)} s, round: {self.round}, Planned participants: " +
                      f"{len(self.sampled_participants)}, Succeed participants: {len(self.stats_util_accumulator)}, Training loss: {avg_loss}")
 
@@ -900,5 +903,8 @@ class Aggregator(job_api_pb2_grpc.JobServiceServicer):
 
 
 if __name__ == "__main__":
+    # import sys
+    # pythonpath = sys.executable
+    # print(pythonpath)
     aggregator = Aggregator(args)
     aggregator.run()
