@@ -37,6 +37,10 @@ from fedscale.utils.model_test_module import test_model
 # FedScale model libs
 from fedscale.utils.models.model_provider import get_cv_model
 
+# from transformers import (AdamW, AlbertTokenizer, AutoConfig,
+#                             AutoModelWithLMHead, AutoTokenizer,
+#                             MobileBertForPreTraining)
+
 tokenizer = None
 if args.task == 'nlp' or args.task == 'text_clf':
     from transformers import (AdamW, AlbertTokenizer, AutoConfig,
@@ -105,6 +109,11 @@ def init_model():
     logging.info("Initializing the model ...")
 
     if args.task == 'nlp':
+
+        from transformers import (AdamW, AlbertTokenizer, AutoConfig,
+                                    AutoModelWithLMHead, AutoTokenizer,
+                                    MobileBertForPreTraining)
+
         config = AutoConfig.from_pretrained(
             os.path.join(args.data_dir, args.model+'-config.json'))
         model = AutoModelWithLMHead.from_config(config)

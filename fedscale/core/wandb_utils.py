@@ -2,7 +2,6 @@ import logging
 import os
 import random
 
-import multiprocess as multiprocessing
 import numpy as np
 import wandb
 
@@ -87,28 +86,27 @@ def wandb_init(args):
         "model": args.model, 
         "dataset": args.data_set,
         "comm_round": args.rounds,
-        "epochs": args.local_epochs,
+        "epochs": args.local_steps,
         "federated_optimizer": args.gradient_policy, 
         "client_optimizer": "sgd",
         "learning_rate": args.learning_rate,
         "batch_size": args.batch_size, 
         "frequency_of_the_test": args.eval_interval,
         "worker_num": args.num_executors,
-        "framework": "FedScale", 
+        "run_name": args.run_name,
+        "framework": "FedScale",
     }
 
-    args = Arguments(wandb_config)
+    # args = Arguments(wandb_config)
 
     if args.enable_wandb:
         wandb_entity = getattr(args, "wandb_entity", None)
         wandb_args = {
             "entity": args.wandb_entity,
             "project": args.wandb_project,
+            "name": args.run_name,
             "config": log_config,
         }
-
-        if hasattr(args, "run_name"):
-            wandb_args["name"] = args.run_name
 
         wandb.init(**wandb_args)
 

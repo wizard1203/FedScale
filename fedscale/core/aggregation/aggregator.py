@@ -3,6 +3,7 @@
 import pickle
 import threading
 from concurrent import futures
+import wandb
 
 import grpc
 import torch
@@ -14,7 +15,7 @@ from fedscale.core.channels import job_api_pb2
 from fedscale.core.logger.aggragation import *
 from fedscale.core.resource_manager import ResourceManager
 
-from fedscale.
+from fedscale.core.wandb_utils import wandb_init
 
 MAX_MESSAGE_LENGTH = 1*1024*1024*1024  # 1GB
 
@@ -98,6 +99,10 @@ class Aggregator(job_api_pb2_grpc.JobServiceServicer):
 
         # ======== Task specific ============
         self.init_task_context()
+        # ======== record runtime and test acc to wandb ============
+        if self.args.enable_wandb:
+            wandb_init(args)
+            self.previous_time = time.time()
 
     def setup_env(self):
         """Set up experiments environment and server optimizer
@@ -555,6 +560,9 @@ class Aggregator(job_api_pb2_grpc.JobServiceServicer):
         self.test_result_accumulator = []
         self.stats_util_accumulator = []
         self.client_training_results = []
+        if self.args.enable_wandb:
+            wandb.log({"RunTimeOneRound": time.time() - self.previous_time, "round": self.round})
+            self.previous_time = time.time()
 
         if self.round >= self.args.rounds:
             self.broadcast_aggregator_events(commons.SHUT_DOWN)
@@ -587,6 +595,10 @@ class Aggregator(job_api_pb2_grpc.JobServiceServicer):
                                    self.global_virtual_clock/60.)
         self.log_writer.add_scalar('FAR/time_to_test_accuracy (min)', self.testing_history['perf'][self.round]['top_1'],
                                    self.global_virtual_clock/60.)
+        if self.args.enable_wandb:
+            wandb.log({"Test/Acc": self.testing_history['perf'][self.round]['top_1']/100, "round": self.round})
+            self.previous_time = time.time()
+
 
     def deserialize_response(self, responses):
         """Deserialize the response from executor

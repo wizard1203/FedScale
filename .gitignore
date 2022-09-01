@@ -34,3 +34,10 @@ common_voice
 puffer  
 landmark  
 coqa
+
+wandb/*
+*tar.gz
+benchmark/dataset/data/*
+
+
+

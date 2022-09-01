@@ -8,7 +8,8 @@ ps_ip: localhost
 # Note that if we collocate ps and worker on same GPU, then we need to decrease this number of available processes on that GPU by 1
 # E.g., master node has 4 available processes, then 1 for the ps, and worker should be set to: worker:3
 worker_ips: 
-    - localhost:[2,1,1,1,1,1,1,1]
+    # - localhost:[2,1,1,1,1,1,1,1]
+    - localhost:[2,1,1,1,0,0,0,0]
     # - localhost:[2]
 
 exp_path: $FEDSCALE_HOME/fedscale/core
@@ -34,16 +35,16 @@ setup_commands:
 # Default parameters are specified in config_parser.py, wherein more description of the parameter can be found
 
 job_conf: 
-    - job_name: reddit                   # Generate logs under this folder: log_path/job_name/time_stamp
+    - job_name: amazon                   # Generate logs under this folder: log_path/job_name/time_stamp
     - log_path: $FEDSCALE_HOME/benchmark # Path of log files
-    - task: nlp
+    - task: text_clf
     - num_participants: 100                      # Number of participants per round, we use K=100 in our paper, large K will be much slower
-    - data_set: blog                     # Dataset: openImg, google_speech, reddit
-    - data_dir: $FEDSCALE_HOME/benchmark/dataset/data/reddit    # Path of the dataset
-    - data_map_file: $FEDSCALE_HOME/benchmark/dataset/data/reddit/client_data_mapping/train.csv              # Allocation of data to each client, turn to iid setting if not provided
+    - data_set: amazon                     # Dataset: openImg, google_speech, reddit
+    - data_dir: $FEDSCALE_HOME/benchmark/dataset/data/amazon    # Path of the dataset
+    - data_map_file: $FEDSCALE_HOME/benchmark/dataset/data/amazon/client_data_mapping/train.csv              # Allocation of data to each client, turn to iid setting if not provided
     - device_conf_file: $FEDSCALE_HOME/benchmark/dataset/data/device_info/client_device_capacity     # Path of the client trace
     - device_avail_file: $FEDSCALE_HOME/benchmark/dataset/data/device_info/client_behave_trace
-    - model: albert-base-v2                            # Models: e.g., shufflenet_v2_x2_0, mobilenet_v2, resnet34, albert-base-v2
+    - model: lr                            # Models: e.g., shufflenet_v2_x2_0, mobilenet_v2, resnet34, albert-base-v2
     - filter_less: 21                       # Remove clients w/ less than 21 samples
     - num_loaders: 4                        # Dataloaders 
     - local_steps: 30

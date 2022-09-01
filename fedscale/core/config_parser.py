@@ -218,6 +218,14 @@ parser.add_argument('--noise-max', default=0.5,
 parser.add_argument('--no-bidirectional', dest='bidirectional', action='store_false', default=True,
                     help='Turn off bi-directional RNNs, introduces lookahead convolution')
 
+parser.add_argument('--enable_wandb', type=str, default='True')
+parser.add_argument('--wandb_entity', type=str, default='automl')
+parser.add_argument('--wandb_key', type=str, default='ee0b5f53d949c84cee7decbe7a629e63fb2f8408')
+parser.add_argument('--wandb_project', type=str, default='bench_optim')
+parser.add_argument('--wandb_name', type=str, default='fedml_optim_bench')
+parser.add_argument('--run_name', type=str, default='fedml_schedule_bench')
+
+
 args, unknown = parser.parse_known_args()
 args.use_cuda = eval(args.use_cuda)
 
