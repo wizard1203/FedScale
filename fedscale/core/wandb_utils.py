@@ -95,6 +95,8 @@ def wandb_init(args):
         "worker_num": args.num_executors,
         "run_name": args.run_name,
         "framework": "FedScale",
+        "num_loaders": args.num_loaders,
+        "worker_num": args.worker_num,
     }
 
     # args = Arguments(wandb_config)

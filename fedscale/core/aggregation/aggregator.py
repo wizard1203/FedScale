@@ -583,6 +583,9 @@ class Aggregator(job_api_pb2_grpc.JobServiceServicer):
             'FAR/round_duration (min)', self.round_duration/60., self.round)
         self.log_writer.add_histogram(
             'FAR/client_duration (min)', self.flatten_client_duration, self.round)
+        if self.args.enable_wandb:
+            wandb.log({"Train/Acc": 0.00, "round": self.round,
+                "Train/Loss": avg_loss})
 
     def log_test_result(self):
         """Log testing result on TensorBoard
@@ -596,8 +599,8 @@ class Aggregator(job_api_pb2_grpc.JobServiceServicer):
         self.log_writer.add_scalar('FAR/time_to_test_accuracy (min)', self.testing_history['perf'][self.round]['top_1'],
                                    self.global_virtual_clock/60.)
         if self.args.enable_wandb:
-            wandb.log({"Test/Acc": self.testing_history['perf'][self.round]['top_1']/100, "round": self.round})
-            self.previous_time = time.time()
+            wandb.log({"Test/Acc": self.testing_history['perf'][self.round]['top_1']/100, "round": self.round,
+                "Test/Loss": self.testing_history['perf'][self.round]['loss']})
 
 
     def deserialize_response(self, responses):

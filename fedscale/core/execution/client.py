@@ -125,6 +125,7 @@ class Client(object):
         return criterion
 
     def train_step(self, client_data, conf, model, optimizer, criterion):
+        tokenizer, device = conf.tokenizer, conf.device
 
         for data_pair in client_data:
             if conf.task == 'nlp':
