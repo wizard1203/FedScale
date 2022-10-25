@@ -96,7 +96,6 @@ def wandb_init(args):
         "run_name": args.run_name,
         "framework": "FedScale",
         "num_loaders": args.num_loaders,
-        "worker_num": args.worker_num,
     }
 
     # args = Arguments(wandb_config)
@@ -109,7 +108,12 @@ def wandb_init(args):
             "name": args.run_name,
             "config": log_config,
         }
-
+        if hasattr(args, "wandb_id") and args.wandb_id is not None:
+            wandb_args["id"] = args.wandb_id
+        if hasattr(args, "wandb_offline") and args.wandb_offline:
+            os.environ['WANDB_MODE'] = 'offline'
+        if hasattr(args, "wandb_console") and args.wandb_console == "off":
+            os.environ['WANDB_CONSOLE'] = 'off'
         wandb.init(**wandb_args)
 
 

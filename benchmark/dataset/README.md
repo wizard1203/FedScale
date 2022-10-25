@@ -131,3 +131,8 @@ and
   year={2021}
 }
 ```
+
+
+
+wget -O reddit.tar.gz https://fedscale.eecs.umich.edu/dataset/reddit.tar.gz
+

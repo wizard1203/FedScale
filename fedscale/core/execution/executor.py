@@ -1,4 +1,7 @@
 # -*- coding: utf-8 -*-
+import sys
+import traceback
+
 import collections
 import gc
 import pickle
@@ -395,6 +398,10 @@ class Executor(object):
                 break
             except Exception as e:
                 logging.warning(f"Failed to connect to aggregator {e}. Will retry in 5 sec.")
+                logging.info(e)
+                traceback.print_exception(*sys.exc_info())
+                # logging.info('traceback.format_exc():\n%s' % traceback.format_exc())
+                logging.info('traceback.format_exc():\n%s' % traceback.format_exc())
                 time.sleep(5)
 
     def client_ping(self):

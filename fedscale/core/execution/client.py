@@ -144,6 +144,9 @@ class Client(object):
             else:
                 (data, target) = data_pair
 
+            # logging.info(f"data.shape: {data.shape}, target.shape: {target.shape}\
+            #     target: {target[:20]}")
+
             if conf.task == "detection":
                 self.im_data.resize_(data[0].size()).copy_(data[0])
                 self.im_info.resize_(data[1].size()).copy_(data[1])

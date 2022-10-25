@@ -1,0 +1,86 @@
+# Configuration file of FAR training experiment
+
+# ========== Cluster configuration ========== 
+# ip address of the parameter server (need 1 GPU process)
+# ps_ip: localhost
+# ps_ip: gpu12
+# ps_ip: 192.168.0.19
+ps_ip: gpu5
+
+# ip address of each worker:# of available gpus process on each gpu in this node
+# Note that if we collocate ps and worker on same GPU, then we need to decrease this number of available processes on that GPU by 1
+# E.g., master node has 4 available processes, then 1 for the ps, and worker should be set to: worker:3
+worker_ips: 
+    - gpu5:[2,1,1,1]
+    - gpu6:[1,1,1,1]
+    - gpu7:[1,1,1,1]
+    - gpu8:[1,1,1,1]
+    # - 192.168.0.19:[2,1,1,1]
+    # - 192.168.0.20:[1,1,1,1]
+    # - gpu12:[2,1,1,1]
+    # - gpu11:[1,1,1,1]
+    # - localhost:[2,1,1,1]
+
+exp_path: $FEDSCALE_HOME/fedscale/core
+
+# Entry function of executor and aggregator under $exp_path
+executor_entry: execution/executor.py
+
+aggregator_entry: aggregation/aggregator.py
+
+auth:
+    ssh_user: ""
+    ssh_private_key: ~/.ssh/id_rsa
+
+# cmd to run before we can indeed run FAR (in order)
+setup_commands:
+    - source $HOME/anaconda3/bin/activate fedscale
+    - export NCCL_SOCKET_IFNAME='enp136s0f0,enp137s0f0'
+    - which python
+    - echo $python
+    - conda activate fedscale
+    - cd $FEDSCALE_HOME
+
+# python_path: /home/chaoyanghe/anaconda3/envs/fedscale/bin/python
+python_path: /home/zhtang/anaconda3/envs/fedscale/bin/python
+# ========== Additional job configuration ========== 
+# Default parameters are specified in config_parser.py, wherein more description of the parameter can be found
+
+
+# --comm_round 200 --epochs 10
+
+job_conf: 
+    - job_name: e_img_c100_k16_fs                   # Generate logs under this folder: log_path/job_name/time_stamp
+    - log_path: $FEDSCALE_HOME/benchmark # Path of log files
+    - num_participants: 100                      # Number of participants per round, we use K=100 in our paper, large K will be much slower
+    - data_set: ILSVRC2012_hdf5             # Dataset: openImg, google_speech, stackoverflow
+    - output_dim: 1000
+    - data_dir: /datasets/imagenet_hdf5/imagenet-shuffled.hdf5    # Path of the dataset
+    - data_map_file: /home/zhtang/FedML/python/fedml/data/ImageNet/imagenet_hdf5_c10000_n1000_alpha0.1.pth              # Allocation of data to each client, turn to iid setting if not provided
+    - device_conf_file: $FEDSCALE_HOME/benchmark/dataset/data/device_info/client_device_capacity     # Path of the client trace
+    - device_avail_file: $FEDSCALE_HOME/benchmark/dataset/data/device_info/client_behave_trace
+    - model: resnet50                            # Models: e.g., shufflenet_v2_x2_0, mobilenet_v2, resnet34, albert-base-v2
+    - model_zoo: fedscale-zoo
+    - gradient_policy: fed-avg                 # {"fed-yogi", "fed-prox", "fed-avg"}, "fed-avg" by default
+    - eval_interval: 10                     # How many rounds to run a testing on the testing set
+    - rounds: 200                          # Number of rounds to run this training. We use 1000 in our paper, while it may converge w/ ~400 rounds
+    - filter_less: 21                       # Remove clients w/ less than 21 samples
+    - num_loaders: 0
+    - yogi_eta: 3e-3 
+    - yogi_tau: 1e-8
+    - local_steps: 2
+    - learning_rate: 0.05
+    - batch_size: 20
+    - test_bsz: 20
+    - malicious_factor: 4
+    - use_cuda: True
+    - num_executors: 16
+    - enable_wandb: True
+    - wandb_entity: automl
+    - wandb_key: ee0b5f53d949c84cee7decbe7a629e63fb2f8408
+    - wandb_project: bench_optim
+    - wandb_name: fedml_optim_bench
+    - run_name: fedml_optim_bench
+    - wandb_id: e_img_c100_k16_fs
+    - wandb_offline: True
+    - wandb_console: False

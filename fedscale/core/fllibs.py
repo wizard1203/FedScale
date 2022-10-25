@@ -36,6 +36,10 @@ from fedscale.dataloaders.utils_data import get_data_transform
 from fedscale.utils.model_test_module import test_model
 # FedScale model libs
 from fedscale.utils.models.model_provider import get_cv_model
+from fedscale.utils.models.cv_models.resnet_torch import resnet50
+
+
+from fedscale.dataloaders.imagenet import ImageNet_hdf5
 
 # from transformers import (AdamW, AlbertTokenizer, AutoConfig,
 #                             AutoModelWithLMHead, AutoTokenizer,
@@ -218,7 +222,11 @@ def init_model():
         else:
             if args.model_zoo == "fedscale-zoo":
                 if args.task == "cv":
-                    model = get_cv_model()
+                    if args.model == "resnet50":
+                        from fedscale.utils.models.cv_models.resnet_torch import resnet50
+                        model = resnet50(num_classes=args.output_dim, in_channels=3, group_norm=args.group_norm_channels)
+                    else:
+                        model = get_cv_model()
                 else:
                     raise NameError(f"Model zoo {args.model_zoo} does not exist")
             elif args.model_zoo == "torchcv":
@@ -269,6 +277,13 @@ def init_dataset():
                                              transform=train_transform)
             test_dataset = datasets.CIFAR10(args.data_dir, train=False, download=True,
                                             transform=test_transform)
+
+        elif args.data_set == "ILSVRC2012_hdf5":
+            train_transform, test_transform = get_data_transform('ILSVRC2012_hdf5')
+            train_dataset = ImageNet_hdf5(
+                args.data_dir, train=True, transform=train_transform)
+            test_dataset = ImageNet_hdf5(
+                args.data_dir, train=False, transform=test_transform)
 
         elif args.data_set == "imagenet":
             train_transform, test_transform = get_data_transform('imagenet')

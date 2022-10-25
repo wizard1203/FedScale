@@ -51,6 +51,7 @@ parser.add_argument('--blacklist_max_len', type=float, default=0.3)
 parser.add_argument('--embedding_file', type=str,
                     default='glove.840B.300d.txt')
 
+parser.add_argument('--group_norm_channels', type=int, default=32)
 
 # The configuration of different hyper-parameters for training
 parser.add_argument('--rounds', type=int, default=50)
@@ -224,6 +225,12 @@ parser.add_argument('--wandb_key', type=str, default='ee0b5f53d949c84cee7decbe7a
 parser.add_argument('--wandb_project', type=str, default='bench_optim')
 parser.add_argument('--wandb_name', type=str, default='fedml_optim_bench')
 parser.add_argument('--run_name', type=str, default='fedml_schedule_bench')
+
+parser.add_argument('--wandb_id', type=str, default=None)
+parser.add_argument('--wandb_offline', type=str, default=None)
+parser.add_argument('--wandb_console', type=str, default="off")
+
+
 
 
 args, unknown = parser.parse_known_args()

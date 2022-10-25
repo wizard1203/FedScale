@@ -9,6 +9,7 @@ from random import Random
 import numpy as np
 from torch.utils.data import DataLoader
 
+import pickle
 #from argParser import args
 
 
@@ -65,31 +66,41 @@ class DataPartitioner(object):
         clientId_maps = {}
         unique_clientIds = {}
         # load meta data from the data_map_file
-        with open(data_map_file) as csv_file:
-            csv_reader = csv.reader(csv_file, delimiter=',')
-            read_first = True
-            sample_id = 0
+        if self.args.data_set == "ILSVRC2012_hdf5":
+            with open(data_map_file, 'rb') as f:
+                net_dataidx_map = pickle.load(f)
+            # self.partitions = net_dataidx_map
+            self.partitions = []
+            for client, partition in net_dataidx_map.items():
+                self.partitions.append(partition)
+            # logging.info(f"net_dataidx_map.keys: {list(net_dataidx_map.keys())}")
+            # logging.info(f"len(self.partitions): {len(self.partitions)}")
+        else:
+            with open(data_map_file) as csv_file:
+                csv_reader = csv.reader(csv_file, delimiter=',')
+                read_first = True
+                sample_id = 0
 
-            for row in csv_reader:
-                if read_first:
-                    logging.info(f'Trace names are {", ".join(row)}')
-                    read_first = False
-                else:
-                    client_id = row[0]
+                for row in csv_reader:
+                    if read_first:
+                        logging.info(f'Trace names are {", ".join(row)}')
+                        read_first = False
+                    else:
+                        client_id = row[0]
 
-                    if client_id not in unique_clientIds:
-                        unique_clientIds[client_id] = len(unique_clientIds)
+                        if client_id not in unique_clientIds:
+                            unique_clientIds[client_id] = len(unique_clientIds)
 
-                    clientId_maps[sample_id] = unique_clientIds[client_id]
-                    self.client_label_cnt[unique_clientIds[client_id]].add(
-                        row[-1])
-                    sample_id += 1
+                        clientId_maps[sample_id] = unique_clientIds[client_id]
+                        self.client_label_cnt[unique_clientIds[client_id]].add(
+                            row[-1])
+                        sample_id += 1
 
-        # Partition data given mapping
-        self.partitions = [[] for _ in range(len(unique_clientIds))]
+            # Partition data given mapping
+            self.partitions = [[] for _ in range(len(unique_clientIds))]
 
-        for idx in range(sample_id):
-            self.partitions[clientId_maps[idx]].append(idx)
+            for idx in range(sample_id):
+                self.partitions[clientId_maps[idx]].append(idx)
 
     def partition_data_helper(self, num_clients, data_map_file=None):
 
@@ -114,6 +125,7 @@ class DataPartitioner(object):
             indexes = indexes[part_len:]
 
     def use(self, partition, istest):
+        logging.info(f"partition: {partition}")
         resultIndex = self.partitions[partition]
 
         exeuteLength = len(resultIndex) if not istest else int(
